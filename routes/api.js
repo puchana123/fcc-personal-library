@@ -28,6 +28,26 @@ module.exports = function (app) {
     .post(async function (req, res){
       let title = req.body.title;
       //response will contain new book object including atleast _id and title
+      // check title input
+      if(!title){
+        res.send('missing required field title');
+        return;
+      };
+      // add new book to database
+      try {
+        const newBook = new Book({
+          title: title,
+          commentcount: 0
+        });
+        const savedBook = await newBook.save();
+        res.json({
+          _id: savedBook._id,
+          title: savedBook.title
+        });
+        console.log('successfully add new book');
+      } catch (error) {
+        console.log('can not add new book:', error);
+      }
     })
     
     .delete(function(req, res){
