@@ -9,7 +9,7 @@
 'use strict';
 
 const { default: mongoose } = require("mongoose");
-const { Book, Comment } = require("../model/model");
+const { Book } = require("../model/model");
 require('dotenv').config();
 
 const url = process.env.MONGO_URL;
@@ -20,9 +20,13 @@ mongoose.connect(url);
 module.exports = function (app) {
 
   app.route('/api/books')
-    .get(function (req, res){
+    .get(async function (req, res){
       //response will be array of book objects
       //json res format: [{"_id": bookid, "title": book_title, "commentcount": num_of_comments },...]
+      // query all books
+      const data = await Book.find();
+      res.json(data);
+      console.log('get all books');
     })
     
     .post(async function (req, res){
@@ -37,7 +41,8 @@ module.exports = function (app) {
       try {
         const newBook = new Book({
           title: title,
-          commentcount: 0
+          commentcount: 0,
+          comments: []
         });
         const savedBook = await newBook.save();
         res.json({
