@@ -54,8 +54,16 @@ module.exports = function (app) {
       }
     })
 
-    .delete(function (req, res) {
+    .delete(async function (req, res) {
       //if successful response will be 'complete delete successful'
+      // delete all books
+      try {
+        await Book.deleteMany();
+        res.send('complete delete successful');
+        console.log('delete all books');
+      } catch (error) {
+        console.log('can not delete all books:', error)
+      }
     });
 
 
@@ -110,12 +118,12 @@ module.exports = function (app) {
       try {
         // find exist book
         const exist_book = await Book.findById(bookid);
-        if(!exist_book){
+        if (!exist_book) {
           res.send('no book exists');
           return;
         };
         // delete exist book
-        await Book.deleteOne({_id: bookid});
+        await Book.deleteOne({ _id: bookid });
         res.send('delete successful');
         console.log(`successfully delete book: ${exist_book.title}`);
       } catch (error) {
