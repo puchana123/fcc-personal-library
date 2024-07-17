@@ -26,7 +26,6 @@ module.exports = function (app) {
       // query all books
       const data = await Book.find();
       res.json(data);
-      console.log('get all books');
     })
 
     .post(async function (req, res) {
@@ -78,10 +77,31 @@ module.exports = function (app) {
       }
     })
 
-    .post(function (req, res) {
+    .post(async function (req, res) {
       let bookid = req.params.id;
       let comment = req.body.comment;
       //json res format same as .get
+      try {
+        // check comment
+        if (!comment) {
+          res.send('missing required field comment');
+          return;
+        };
+        // get exist book
+        const exist_book = await Book.findById(bookid);
+        if (!exist_book) {
+          res.send('no book exists');
+          return;
+        };
+        // add comment
+        exist_book.comments.push(comment);
+        exist_book.commentcount++;
+        const saved_comment = await exist_book.save();
+        res.json(saved_comment);
+        console.log(`successfully add comment to ${exist_book.title}`);
+      } catch (error) {
+        console.log('can not comment:', error);
+      }
     })
 
     .delete(function (req, res) {
